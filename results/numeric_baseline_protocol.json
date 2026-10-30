@@ -1,0 +1,10 @@
+{
+  "label": "Post-hoc exploratory comparison; original ResNet test results already observed",
+  "features": "20 consecutive same-asset Close values divided by the first input Close",
+  "assets": ["SPY", "QQQ", "IWM", "TLT", "GLD"],
+  "sample_identity": "Rebuild from original raw snapshots and verify against the original multi-asset manifest, using original dataset hashes.",
+  "split": "Original split by label date: train 2010-2021, validation 2022-2023, test 2024-2025",
+  "model": "StandardScaler fit on pooled training features only; LogisticRegression(C=1.0, solver=lbfgs, max_iter=2000, random_state=42), trained once on training set",
+  "selection": "Fixed configuration; no tuning or refit on validation; validation reported, then one final test prediction pass.",
+  "metrics": "Accuracy, up-class precision, recall, F1, confusion matrix; zero division 0; compare original pooled image model, majority and trend on identical samples."
+}

@@ -1,5 +1,7 @@
 # Execution record
 
+The following initial records describe the local workspace at the time of the 2026-10-28–29 experiments, before the public release. Statements that no repository or upload existed are historical, not the current project status.
+
 - Existing D2 run, 2026-10-28 UTC: `python scripts/train_spy_resnet.py --output experiments/spy_resnet18_d2_seed42`, NVIDIA GeForce RTX 4060 Laptop GPU, CUDA, PyTorch 2.8.0+cu126, torchvision 0.23.0+cu126, seed 42, batch 32, Adam classifier lr 0.001, 10 epochs. Original history and best checkpoint remain in that directory. Existing log records a successful checkpoint reload.
 - 2026-10-29: `python scripts/train_spy_full_finetune.py --output experiments/spy_resnet18_full_finetune_seed42`, same GPU and library versions, seed 42, batch 32, Adam backbone lr 0.00001, classifier lr 0.001, 10 epochs. The best checkpoint was reloaded and matched validation predictions and loss. No test evaluation.
 - 2026-10-29: `python scripts/build_multi_asset_dataset.py`, reused checked existing historical data and SPY images, created independent asset images and metadata. Calendar check passed for all assets.
@@ -13,3 +15,8 @@ Local experiment directories contain full configurations and logs, including loc
 - 2026-10-29: `python scripts/summarize_results.py` generated aggregate tables and figures. Matplotlib reported that its default user cache was not writable, but successfully produced the figures; the script was updated to use a project-local cache for future runs.
 - A bare temporary Git repository also could not write its configuration in the sandbox. Existing user files and experiment outputs were not deleted or reset.
 - Final verification: `python -m unittest discover -s tests -v` passed all 11 tests, including CPU/GPU smoke and multi-asset ordering and loss aggregation. The aggregate test counts and confusion-matrix totals were checked without rerunning inference. No clean-environment installation or full replay was performed in this workspace.
+
+- Public release: repository created on 2026-10-30 at 03:26:33 UTC, [aononoismycat-byte/financial-chart-resnet](https://github.com/aononoismycat-byte/financial-chart-resnet), initial published commit `342bebea6c5f4d409dd3141f01ee63ab8658043e` (commit timestamp 03:26:25 UTC). The original staging check was subsequently completed; raw data, checkpoints and caches were excluded.
+- 2026-10-30: added a prediction demo and ran `python scripts/predict.py --input examples/sample_20_closes.csv --checkpoint experiments/multi_asset_resnet18_seed42/best_model.pt` with synthetic input. The missing-checkpoint error was also checked. No ResNet training was repeated.
+- 2026-10-30: ran `python scripts/numeric_baseline_posthoc.py` once with the fixed protocol in `results/numeric_baseline_protocol.json`; the scaler and classifier were fit on train only. Original raw and manifest hashes and sample identity were verified before comparing. Original ResNet test results had already been observed, so the new test comparison is post-hoc exploratory.
+- 2026-10-30: `python -m unittest discover -s tests -v` passed 14 tests including CPU/GPU smoke and new input, preprocessing and numeric workflow tests.

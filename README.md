@@ -4,7 +4,7 @@ A reproducible study of whether an image classifier extracts information about n
 
 ## Task and data
 
-For each asset separately, use the 20 closes ending at session `t` to draw a 224 × 224 RGB line chart. Label 1 when `Close[t+1] > Close[t]`, otherwise 0. Split by the **label date**: 2010–2021 train, 2022–2023 validation, 2024–2025 test. Assets: SPY, QQQ, IWM, TLT, GLD. Input windows at a split boundary may use earlier known closes; they never use the label-date close in the image. Charts divide by the first close, use a fixed y range 0.8–1.2 and clip outside it; there is no augmentation. Pixels use ImageNet normalization.
+For each asset separately, use the 20 closes ending at session `t` to draw a 224 × 224 RGB line chart. Label 1 means Up (`Close[t+1] > Close[t]`); label 0 means Non-up (`Close[t+1] <= Close[t]`, including decreases and ties). Split by the **label date**: 2010–2021 train, 2022–2023 validation, 2024–2025 test. Assets: SPY, QQQ, IWM, TLT, GLD. Input windows at a split boundary may use earlier known closes; they never use the label-date close in the image. Charts divide by the first close, use a fixed y range 0.8–1.2 and clip outside it; there is no augmentation. Pixels use ImageNet normalization.
 
 Data are daily Yahoo Finance history obtained with [yfinance](https://github.com/ranaroussi/yfinance), `auto_adjust=False`, 2009-01-01 inclusive to 2026-01-01 exclusive. Yahoo's returned `Close` is used, not `Adj Close`; it should not be treated as dividend-adjusted total return. See [Yahoo Terms of Service](https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html), [Yahoo Finance data providers](https://help.yahoo.com/kb/SLN2310.html), and the yfinance disclaimer: yfinance is unaffiliated with Yahoo, intended for research and education, and Yahoo's API is described as intended for personal use. Check the applicable terms before use or distribution. Raw prices are not included in this repository.
 
@@ -25,6 +25,29 @@ The pooled classifier-only model's minimum overall validation loss was 0.698657 
 The complete per-asset validation and test tables, including precision, recall, F1, cross entropy and confusion matrices, are in [results/results.md](results/results.md); raw aggregates and the frozen configuration are in [results/summary.json](results/summary.json). Curves and figures are in `results/`.
 
 ![Five-asset test accuracy](results/test_accuracy.png)
+
+## Post-hoc exploratory numeric baseline
+
+After the original ResNet test results were known, we trained one fixed logistic regression on the same 20 closes divided by their first close. A StandardScaler was fit on pooled training data only; C=1.0 was fixed, with no hyperparameter search or validation refit. The script verifies the original raw and manifest hashes and each sample's identity before evaluation. This is a **post-hoc exploratory comparison**, not a fresh confirmatory test.
+
+| Test accuracy | SPY | QQQ | IWM | TLT | GLD | Overall |
+|---|---:|---:|---:|---:|---:|---:|
+| Logistic regression | 55.78% | 56.77% | 52.39% | 49.60% | 58.96% | 54.70% |
+| Pooled ResNet-18 | 49.40% | 48.21% | 47.81% | 48.80% | 46.61% | 48.17% |
+| Majority | 57.77% | 57.97% | 52.19% | 50.20% | 58.17% | 55.26% |
+| 20-day trend | 52.79% | 52.59% | 48.01% | 46.61% | 50.60% | 50.12% |
+
+The numeric model exceeds the image model and trend baseline overall and on each asset, but falls below the majority baseline overall and on SPY, QQQ and TLT. This comparison does not demonstrate added value from the image representation; it also cannot establish that images never help, generalize beyond these assets or periods, or support a trading strategy. Complete validation and test metrics and matrices are in [numeric_baseline_posthoc.json](results/numeric_baseline_posthoc.json); the fixed protocol is in [numeric_baseline_protocol.json](results/numeric_baseline_protocol.json).
+
+## Prediction demo
+
+After installing dependencies as below, provide a **trained project checkpoint** and a CSV with exactly one `Close` column and 20 finite positive values, oldest first. The user must ensure they are consecutive trading sessions; prices alone cannot verify dates. The included `examples/sample_20_closes.csv` is synthetic, not historical market data, and its output is not an actual financial forecast.
+
+```powershell
+.\.venv\Scripts\python.exe scripts/predict.py --input examples/sample_20_closes.csv --checkpoint experiments/multi_asset_resnet18_seed42/best_model.pt
+```
+
+The JSON output is the predicted Up (label 1) or Non-up (label 0, including ties) and the two softmax scores `probability_up` and `probability_non_up`. A tie between scores selects Non-up, matching the model's argmax convention. These scores are not established as calibrated real-world probabilities or trading recommendations. The demo uses the same chart and ImageNet normalization as training, including the fixed chart range and clipping. It loads the checkpoint's training mode and full state; it fails if the file is absent. Project checkpoints are **not distributed** in this repository. To obtain one, run the full reproduction steps below to train the five-asset model, or supply a compatible previously trained project checkpoint. ImageNet pretrained weights alone are not a trained project checkpoint.
 
 ## Reproduce in a clean Windows PowerShell environment
 
@@ -48,6 +71,14 @@ py -3.11 -m venv .venv
 ```
 
 The scripts refuse to overwrite pre-existing experiment or dataset outputs. The commands above are for a **clean checkout**, not the original workspace, whose existing experiments must be preserved. Downloading data and pretrained weights requires internet access. The evaluation freezes the protocol, checkpoint hashes and configuration before inference; its output directory must be new. `results/` contains the reported aggregates and charts; local checkpoints and data must be generated separately. If downloading the historical source later produces different hashes, that is a different data snapshot, not an exact replay.
+
+To reproduce the post-hoc numeric experiment after building the five-asset dataset, run:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/numeric_baseline_posthoc.py --output results_reproduced/numeric_baseline_posthoc.json
+```
+
+This command requires the original source snapshot and exact manifest hashes recorded in `results/summary.json`; it fails instead of comparing different samples if a fresh download has changed. It does not need an image-model checkpoint or retraining, but it does require the original raw files and generated manifest. No full clean-environment replay has yet been performed.
 
 ## Limitations
 
