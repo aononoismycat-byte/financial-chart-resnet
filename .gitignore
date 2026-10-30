@@ -1,0 +1,27 @@
+# Local environments, caches, data, generated images, and model weights
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+data/
+experiments/*
+!experiments/research_protocol.json
+results_reproduced/
+*.pt
+*.pth
+*.ckpt
+*.log
+*.tmp
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.aws/
+.codex/
+.agents/
+.DS_Store
+Thumbs.db

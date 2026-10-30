@@ -1,0 +1,15 @@
+# Execution record
+
+- Existing D2 run, 2026-10-28 UTC: `python scripts/train_spy_resnet.py --output experiments/spy_resnet18_d2_seed42`, NVIDIA GeForce RTX 4060 Laptop GPU, CUDA, PyTorch 2.8.0+cu126, torchvision 0.23.0+cu126, seed 42, batch 32, Adam classifier lr 0.001, 10 epochs. Original history and best checkpoint remain in that directory. Existing log records a successful checkpoint reload.
+- 2026-10-29: `python scripts/train_spy_full_finetune.py --output experiments/spy_resnet18_full_finetune_seed42`, same GPU and library versions, seed 42, batch 32, Adam backbone lr 0.00001, classifier lr 0.001, 10 epochs. The best checkpoint was reloaded and matched validation predictions and loss. No test evaluation.
+- 2026-10-29: `python scripts/build_multi_asset_dataset.py`, reused checked existing historical data and SPY images, created independent asset images and metadata. Calendar check passed for all assets.
+- 2026-10-29: `python -m unittest discover -s tests -v`, existing 9 tests passed on CPU and GPU; added multi-asset test passed separately.
+- The workspace had no Git repository when inspected (`git status` reported not a repository). No Git repository, public upload, or push was created.
+
+Local experiment directories contain full configurations and logs, including local paths; those files are excluded from the proposed public release. Results in `results/` are curated aggregates without local paths.
+- An isolated temporary `git init` used to check ignore rules failed because writing `.git/config` was denied by the environment; no existing repository was modified. The ignore rules were inspected directly, but an actual Git staging check must be performed when repository metadata is writable.
+- 2026-10-29: `python scripts/train_multi_asset.py`, selected classifier-only using the pre-recorded SPY validation-loss rule; CUDA, seed 42, batch 32, Adam classifier lr 0.001, 10 epochs, 15,105 train and 2,505 validation samples. Best epoch 9, validation loss 0.698657446; reloaded checkpoint and validation predictions matched.
+- 2026-10-29: `python scripts/evaluate_final.py` wrote the frozen protocol, dataset and checkpoint hashes before one final evaluation. It evaluated the selected SPY checkpoint and the pooled checkpoint on the corresponding same test samples as the baselines; no further model selection or training followed.
+- 2026-10-29: `python scripts/summarize_results.py` generated aggregate tables and figures. Matplotlib reported that its default user cache was not writable, but successfully produced the figures; the script was updated to use a project-local cache for future runs.
+- A bare temporary Git repository also could not write its configuration in the sandbox. Existing user files and experiment outputs were not deleted or reset.
+- Final verification: `python -m unittest discover -s tests -v` passed all 11 tests, including CPU/GPU smoke and multi-asset ordering and loss aggregation. The aggregate test counts and confusion-matrix totals were checked without rerunning inference. No clean-environment installation or full replay was performed in this workspace.

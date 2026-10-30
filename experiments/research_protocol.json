@@ -1,0 +1,8 @@
+{
+  "decision_record": "Recorded before completion of SPY full-finetune and before test evaluation.",
+  "mode_selection": "Compare minimum validation cross entropy of existing SPY classifier-only and fixed SPY full-finetune; use lower loss mode for one pooled five-asset run. Tie: classifier_only.",
+  "pooled_training": "ImageNet ResNet-18, seed 42, batch size 32, 10 epochs, Adam, CrossEntropyLoss, no augmentation; classifier-only lr 0.001 or full-finetune backbone lr 0.00001 and classifier lr 0.001. Shuffle training; select checkpoint by minimum overall validation loss; earliest epoch on tie.",
+  "final_evaluation": "Evaluate frozen SPY-selected checkpoint on SPY test and pooled checkpoint on all five assets once; compare majority class chosen on respective training labels and 20-day input trend on identical samples. Report accuracy, up precision, recall, F1 and confusion matrix; do not train or choose based on test.",
+  "preprocessing": "20 same-asset closes including t; fixed chart and ImageNet normalization; label is Close[t+1] > Close[t], split by label date.",
+  "primary_metrics": "cross entropy for model and checkpoint selection; accuracy and classification metrics for final comparison"
+}
