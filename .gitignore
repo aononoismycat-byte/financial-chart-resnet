@@ -25,3 +25,10 @@ results_reproduced/
 .agents/
 .DS_Store
 Thumbs.db
+
+# Personal documents and local scratch folders
+*CV*
+*Resume*
+*resume*
+*.docx
+cv_render/

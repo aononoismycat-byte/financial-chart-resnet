@@ -1,12 +1,22 @@
 # Financial Chart ResNet
 
-A reproducible study of whether an image classifier extracts information about next-session ETF close direction from a chart of the previous 20 closes. This is an experimental classification project, not a trading system or evidence of profitability.
+[![CI](https://github.com/aononoismycat-byte/financial-chart-resnet/actions/workflows/ci.yml/badge.svg)](https://github.com/aononoismycat-byte/financial-chart-resnet/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB.svg)
+
+An empirical, leakage-controlled evaluation of whether an ImageNet-pretrained ResNet-18 extracts next-session directional signal from 20-day closing-price line charts across five liquid ETFs (`SPY`, `QQQ`, `IWM`, `TLT`, `GLD`; 2010–2025, 20,120 samples). Designed around pre-registered model selection, chronological splits, cryptographic manifest verification, and explicit baseline benchmarking.
+
+### Key Findings
+
+- **Frozen-backbone transfer resists overfitting better than full fine-tuning**: On `SPY` validation data, freezing the ResNet-18 backbone (`0.6985` cross-entropy) outperformed full fine-tuning (`0.7340`), which rapidly overfit noisy chart images.
+- **Line-chart CNNs underperform simple baselines out of sample**: On `2,510` held-out 2024–2025 test windows, the pooled ResNet-18 achieved **48.17%** accuracy, trailing both a 20-day trend rule (**50.12%**) and a constant training-majority baseline (**55.26%**, driven by bull-market upward drift).
+- **Direct numeric inputs beat rendered 1-pixel line charts**: A post-hoc `StandardScaler` + logistic regression trained on the exact same 20 normalized closes reached **54.70%** overall test accuracy (`+6.53 pp` over ResNet-18), indicating no added predictive value from rendering univariate closes as 2D line images.
 
 ## Task and data
 
 For each asset separately, use the 20 closes ending at session `t` to draw a 224 × 224 RGB line chart. Label 1 means Up (`Close[t+1] > Close[t]`); label 0 means Non-up (`Close[t+1] <= Close[t]`, including decreases and ties). Split by the **label date**: 2010–2021 train, 2022–2023 validation, 2024–2025 test. Assets: SPY, QQQ, IWM, TLT, GLD. Input windows at a split boundary may use earlier known closes; they never use the label-date close in the image. Charts divide by the first close, use a fixed y range 0.8–1.2 and clip outside it; there is no augmentation. Pixels use ImageNet normalization.
 
-Data are daily Yahoo Finance history obtained with [yfinance](https://github.com/ranaroussi/yfinance), `auto_adjust=False`, 2009-01-01 inclusive to 2026-01-01 exclusive. Yahoo's returned `Close` is used, not `Adj Close`; it should not be treated as dividend-adjusted total return. See [Yahoo Terms of Service](https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html), [Yahoo Finance data providers](https://help.yahoo.com/kb/SLN2310.html), and the yfinance disclaimer: yfinance is unaffiliated with Yahoo, intended for research and education, and Yahoo's API is described as intended for personal use. Check the applicable terms before use or distribution. Raw prices are not included in this repository.
+Data are daily Yahoo Finance history (`auto_adjust=False`, 2009-01-01 inclusive to 2026-01-01 exclusive) obtained with [yfinance](https://github.com/ranaroussi/yfinance) using unadjusted `Close` prices; raw price files are not distributed in this repository (see [Limitations and disclaimers](#limitations-and-disclaimers)).
 
 Five assets each had 4,276 valid unique observed sessions between 2009-01-02 and 2025-12-31, matching the fixed 2009–2025 calendar in `src/samples.py`. Each yielded 3,021 train, 501 validation and 502 test examples. Per-asset up ratios, clip counts and raw SHA-256 values are in `results/summary.json`. The calendar is explicitly bounded; it is not a general future exchange calendar.
 
@@ -47,7 +57,7 @@ After installing dependencies as below, provide a **trained project checkpoint**
 .\.venv\Scripts\python.exe scripts/predict.py --input examples/sample_20_closes.csv --checkpoint experiments/multi_asset_resnet18_seed42/best_model.pt
 ```
 
-The JSON output is the predicted Up (label 1) or Non-up (label 0, including ties) and the two softmax scores `probability_up` and `probability_non_up`. A tie between scores selects Non-up, matching the model's argmax convention. These scores are not established as calibrated real-world probabilities or trading recommendations. The demo uses the same chart and ImageNet normalization as training, including the fixed chart range and clipping. It loads the checkpoint's training mode and full state; it fails if the file is absent. Project checkpoints are **not distributed** in this repository. To obtain one, run the full reproduction steps below to train the five-asset model, or supply a compatible previously trained project checkpoint. ImageNet pretrained weights alone are not a trained project checkpoint.
+The JSON output reports the predicted class (`Up` for label 1 or `Non-up` for label 0, with ties resolved to `Non-up`) along with softmax scores `probability_up` and `probability_non_up` using the exact training chart renderer and ImageNet normalization. Binary checkpoints are excluded from Git tracking: you can either download the pre-trained pooled checkpoint (`multi_asset_resnet18_seed42.pt`, SHA-256 `0e0fb7df7e351b388e64861400d99bd38163927996b784ce6d01000ff5dbab10`) from [GitHub Releases](https://github.com/aononoismycat-byte/financial-chart-resnet/releases) or train one locally via the reproduction pipeline below. ImageNet pretrained weights alone are not a compatible project checkpoint.
 
 ## Reproduce in a clean Windows PowerShell environment
 
@@ -80,12 +90,11 @@ To reproduce the post-hoc numeric experiment after building the five-asset datas
 
 This command requires the original source snapshot and exact manifest hashes recorded in `results/summary.json`; it fails instead of comparing different samples if a fresh download has changed. It does not need an image-model checkpoint or retraining, but it does require the original raw files and generated manifest. No full clean-environment replay has yet been performed.
 
-## Limitations
+## Limitations and disclaimers
 
-- Overlapping windows and correlated assets make examples dependent; one chronological split and one seed do not establish statistical robustness or reliable future performance.
-- Test up ratios were included in the dataset audit before model selection, although test predictions and performance were withheld until the frozen final evaluation. This is not a fully blinded test-label distribution.
-- A fixed chart range clips some windows, and a one-pixel line discards other useful information. Results depend on chart and price conventions.
-- `Close` with `auto_adjust=False` can reflect ex-dividend effects and is not total return. Accuracy omits transaction costs, execution, uncertainty and risk; none of the reported metrics establish a profitable strategy.
-- Yahoo history may be revised or unavailable; data access and redistribution are subject to its terms. The training procedure is seeded, but GPU results are not guaranteed identical across hardware or versions.
+- **Research-only scope**: This repository is an empirical machine-learning study, not financial advice, a trading system, or evidence of live profitability. Softmax outputs are uncalibrated classification scores, and raw accuracy omits transaction costs, slippage, turnover, and risk-adjusted return metrics.
+- **Statistical and regime constraints**: Overlapping 20-day windows and cross-asset correlations make observations non-i.i.d.; a single chronological split and single seed (`42`) do not establish statistical significance across market regimes. Test-set class proportions (`55.26%` Up) were recorded in the dataset audit prior to model selection, though test predictions were withheld until the frozen evaluation.
+- **Representation and price conventions**: A fixed `[0.8, 1.2]` chart range clips extreme volatility windows, and a 1-pixel close-only line omits OHLC range and volume information. Using `Close` with `auto_adjust=False` reflects ex-dividend drops rather than total return.
+- **Data terms and hardware determinism**: Market data are retrieved via [yfinance](https://github.com/ranaroussi/yfinance) (unaffiliated with Yahoo and intended for research/educational use; see [Yahoo Terms of Service](https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html) and [Yahoo Finance data providers](https://help.yahoo.com/kb/SLN2310.html)). Upstream history revisions or GPU/CUDA version differences can alter exact numerical replay.
 
-Potential future work, outside the reported experiment, includes a fully blinded later period, rolling time validation, multiple seeds and uncertainty estimates that account for temporal and cross-asset dependence. Any trading assessment would require a separately specified, cost-aware protocol.
+Planned extensions include transaction-cost-aware backtesting, threshold-independent and calibration metrics (ROC-AUC, balanced accuracy, Brier score), stronger tabular baselines, walk-forward validation, and feature attribution.
