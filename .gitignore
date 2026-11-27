@@ -9,6 +9,7 @@ __pycache__/
 data/
 experiments/*
 !experiments/research_protocol.json
+!experiments/p1_protocol.json
 results_reproduced/
 *.pt
 *.pth

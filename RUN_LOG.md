@@ -52,3 +52,19 @@ Chronological record of protocol registration, training runs, frozen test evalua
   - Setup: `StandardScaler` + `LogisticRegression(C=1.0)` fit strictly on pooled training data using the same normalized 20-day close vectors, after cryptographic verification of raw CSV and manifest hashes.
   - Outcome: Overall held-out test accuracy `54.70%` vs. `48.17%` for pooled ResNet-18 and `55.26%` for the pooled majority baseline. Explicitly labeled **post-hoc exploratory** because test labels had already been evaluated in Phase 1.
   - Verification: All CPU and GPU unit tests passed (`python -m unittest discover -s tests -v`).
+
+---
+
+## Phase 3 — P1 Extension, Stage 1: Probabilistic Evaluation (2026-11-27, post-hoc exploratory)
+
+- **2026-11-27 — P1 Protocol Registration**
+  - Recorded `experiments/p1_protocol.json` (Stages 1–8: metrics, bootstrap, backtest, tabular baselines, walk-forward, seeds, explainability, optional 2026 holdout) before computing any P1 result. No 2026 price data had been downloaded by the pipeline.
+
+- **2026-11-27 — Verified Prediction Export**
+  - Command: `python scripts/p1_export_predictions.py`
+  - Regenerated per-sample validation/test scores for the frozen pooled and SPY ResNet-18 checkpoints, the fixed logistic regression, majority/climatology and 20-day trend. Reproduction gate passed: all 64 frozen confusion-matrix and loss checks matched exactly. Output `results/p1/predictions.csv` (no prices) with hashes in `predictions_meta.json`.
+
+- **2026-11-27 — Stage 1 Metrics**
+  - Command: `python scripts/p1_stage1_metrics.py` (CPU only, reads the committed predictions).
+  - Pooled test: ResNet-18 accuracy `48.17%` but balanced accuracy `50.30%` [48.63, 52.01] and ROC-AUC `0.516` [0.495, 0.537], statistically indistinguishable from logistic regression (AUC difference `+0.002` [−0.027, +0.029]). Its accuracy deficit versus majority (`−7.09 pp` [−10.72, −3.35]) comes from probabilities shifted below 0.5 (miscalibrated intercept) in an up-trending test period, not from worse ranking. No model achieved positive Brier skill against climatology.
+

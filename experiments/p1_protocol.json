@@ -1,0 +1,87 @@
+{
+  "title": "P1 extension protocol: probabilistic evaluation, cost-aware backtest, tabular baselines, walk-forward, robustness and explainability",
+  "recorded_at": "2026-11-27",
+  "decision_record": "Recorded before any P1 metric, backtest, feature model, walk-forward run, additional seed or attribution was computed. Stage 2-8 specifications are planned; any change must be appended to amendments with date and reason before the affected stage runs.",
+  "study_status": "Post-hoc exploratory extension. Labels for the 2024-2025 test period and the Phase 1/2 test accuracies were already observed. P1 results must not be used to revise Phase 1 conclusions, re-select Phase 1 models or tune any P1 model on test data.",
+  "data": {
+    "source_snapshot": "Original Yahoo Finance raw files and multi-asset manifest; SHA-256 values in results/summary.json must match before any stage runs.",
+    "assets": ["SPY", "QQQ", "IWM", "TLT", "GLD"],
+    "splits": "Unchanged label-date split: train 2010-2021, validation 2022-2023, test 2024-2025.",
+    "post_2025_data": "As of this protocol, no 2026 price data have been downloaded or processed by the project pipeline."
+  },
+  "stages": {
+    "stage_1_probabilistic_evaluation": {
+      "models": {
+        "resnet_pooled": "Frozen pooled ResNet-18 checkpoint (freeze.pooled_checkpoint_sha256); score = softmax P(Up); prediction = logit argmax (tie -> Non-up).",
+        "resnet_spy": "Frozen SPY ResNet-18 checkpoint (freeze.spy_checkpoint_sha256); SPY rows only.",
+        "logreg_closes": "Deterministic refit of the fixed post-hoc logistic regression (results/numeric_baseline_protocol.json) on pooled train only; score = predict_proba Up.",
+        "majority": "Pooled training majority class (1) as hard prediction.",
+        "climatology": "Constant probability equal to the pooled training up-ratio; used as the probabilistic counterpart of majority and as the Brier skill reference.",
+        "trend_20d": "Hard 0/1 rule: last input close > first input close. Probability metrics are computed on hard scores and flagged as such."
+      },
+      "reproduction_gate": "Regenerated predictions must reproduce every frozen confusion matrix (validation and test, overall and per asset) in results/summary.json and results/numeric_baseline_posthoc.json exactly; otherwise the stage aborts.",
+      "metrics": ["accuracy", "balanced_accuracy", "roc_auc (average ranks for ties)", "brier", "brier_skill_score vs climatology", "log_loss (probabilities clipped to [1e-15, 1-1e-15])", "ece with 10 equal-frequency bins", "reliability diagram"],
+      "groups": ["overall", "SPY", "QQQ", "IWM", "TLT", "GLD"],
+      "uncertainty": {
+        "method": "Circular moving-block bootstrap over unique label dates; every asset row on a resampled date is kept to preserve cross-asset dependence.",
+        "block_length_sessions": 20,
+        "replicates": 5000,
+        "seed": 20261127,
+        "interval": "95% percentile",
+        "paired_comparisons": ["resnet_pooled - majority/climatology", "resnet_pooled - logreg_closes", "logreg_closes - majority/climatology", "trend_20d - majority/climatology", "resnet_spy - majority/climatology (SPY only)"],
+        "binomial_test": "Exact two-sided binomial test of accuracy against 0.5, reported with the caveat that it assumes independent observations."
+      },
+      "validation_reporting": "Validation (2022-2023) point metrics are reported for context; bootstrap intervals are computed for test only."
+    },
+    "stage_2_cost_aware_backtest": {
+      "positions": "Long/flat per asset: long 1 unit when prediction = Up, otherwise flat in cash at 0% return. No shorting or leverage. Threshold fixed at 0.5 / model argmax.",
+      "timing": "Decision at close t using information through close t; position earns the close-t to close-(t+1) return (market-on-close execution assumption). Robustness: one-session delayed execution.",
+      "returns": "Asset returns from Adj Close (dividend-inclusive); signals remain based on unadjusted Close inputs.",
+      "costs_bps_one_way": [0, 2, 5, 10],
+      "cost_rule": "Cost = bps x |position_t - position_(t-1)|, initial entry included.",
+      "portfolio": "Per-asset sleeves plus an equal-weight five-asset portfolio (mean of sleeve daily returns).",
+      "benchmarks": ["buy_and_hold", "trend_20d", "logreg_closes", "resnet_pooled", "later P1 models"],
+      "metrics": ["CAGR", "annualized volatility", "Sharpe (rf = 0, 252 sessions)", "Sortino", "maximum drawdown", "Calmar", "annual turnover", "exposure", "hit rate"],
+      "uncertainty": "Same date-block bootstrap for Sharpe and Sharpe difference versus buy-and-hold.",
+      "tuning": "None. The backtest is an evaluation layer only."
+    },
+    "stage_3_tabular_baselines": {
+      "primary_information_set": "Only the same 20 unadjusted closes used by the image model, plus asset identity.",
+      "features": ["returns over 1, 5, 10 and 19 sessions", "realized volatility of 5 and 19 daily log returns", "RSI over the last 14 changes", "close deviation from 5, 10 and 20 session means", "maximum drawdown within window", "position within 20-session range", "skewness of daily returns", "fraction of up days", "asset one-hot"],
+      "secondary_information_set": "Exploratory extension with OHLC range, volume z-score and 60-session momentum; reported separately and never mixed into primary conclusions.",
+      "models": {
+        "lightgbm": "binary objective; num_leaves 15; learning_rate 0.02; n_estimators up to 2000 with early stopping on validation log loss (patience 100); min_child_samples 100; subsample 0.8 with bagging_freq 1; colsample_bytree 0.8; reg_lambda 1.0; seed 42.",
+        "logreg_features": "StandardScaler + LogisticRegression(C=1.0) on the same engineered features."
+      },
+      "selection": "Validation used only for early stopping; one test prediction pass."
+    },
+    "stage_4_walk_forward": {
+      "scheme": "Expanding window with annual refits. For test year Y in 2014-2025: train on label years 2010 to Y-2, validate on Y-1 (early stopping only), test on Y.",
+      "models": ["majority", "trend_20d", "logreg_closes", "logreg_features", "lightgbm", "resnet_embedding_head"],
+      "resnet_embedding_head": "Frozen ImageNet ResNet-18 penultimate 512-d embeddings of the same charts + StandardScaler + LogisticRegression(C=1.0). With a frozen backbone and frozen BatchNorm statistics this is the same model family as the classifier-only ResNet; only the head optimizer differs.",
+      "reporting": "Per-year metrics, pooled out-of-sample metrics and a backtest of concatenated out-of-sample signals. Years 2024-2025 are flagged as previously observed."
+    },
+    "stage_5_robustness": {
+      "seeds": [0, 1, 2, 3, 4],
+      "resnet": "Retrain pooled classifier-only ResNet-18 with the original procedure for each seed (checkpoint by validation loss) and evaluate test once per seed.",
+      "lightgbm": "Repeat with the same seeds (bagging and column-sampling randomness).",
+      "comparisons": "Mean, standard deviation and range across seeds; paired date-block bootstrap for pre-specified model differences with Holm correction across the comparison family."
+    },
+    "stage_6_explainability_governance": {
+      "grad_cam": "Grad-CAM on layer4 of the pooled ResNet for a fixed selection (most confident Up, most confident Non-up, closest to 0.5) and class-averaged heatmaps; report the share of attribution in the rightmost quarter of the chart.",
+      "shap": "TreeExplainer on the Stage 3 LightGBM test predictions: global mean |SHAP|, beeswarm and dependence plots for the top features.",
+      "model_card": "docs/MODEL_CARD.md with model-risk headings: intended use, conceptual soundness, data, outcomes analysis, limitations, ongoing monitoring."
+    },
+    "stage_7_integration": "Unified results tables, rerun Stage 1-2 evaluation for all new models, README and RUN_LOG update, release with artifacts.",
+    "stage_8_optional_fresh_holdout": "Optional confirmatory test on 2026 sessions with models frozen beforehand. Requires an amendment that fixes the 2026 session calendar, data cut-off and models before any 2026 data are downloaded."
+  },
+  "amendments": [
+    {
+      "date": "2026-11-27",
+      "stage": "stage_6_explainability_governance",
+      "change": "shap package replaced by LightGBM native TreeSHAP (booster.predict(..., pred_contrib=True)), mathematically identical; avoids numba/numpy-2.4 dependency.",
+      "reason": "Keep CI and local environment free of numba/numpy-2.4 incompatibility while producing exact TreeSHAP attributions verified by row-sum additivity.",
+      "recorded_before_running": true
+    }
+  ]
+}
