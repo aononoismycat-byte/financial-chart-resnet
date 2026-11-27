@@ -1,0 +1,79 @@
+{
+  "stage": "P1 Stage 5 multi-seed robustness (post-hoc exploratory)",
+  "seeds": [
+    42,
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "logits_equivalence_max_abs_diff": 2.384185791015625e-07,
+  "seed_training": {
+    "resnet": [
+      {
+        "seed": 42,
+        "best_epoch": 9,
+        "best_val_loss": 0.6984736323356628
+      },
+      {
+        "seed": 0,
+        "best_epoch": 7,
+        "best_val_loss": 0.695314347743988
+      },
+      {
+        "seed": 1,
+        "best_epoch": 4,
+        "best_val_loss": 0.6951838731765747
+      },
+      {
+        "seed": 2,
+        "best_epoch": 1,
+        "best_val_loss": 0.6955850720405579
+      },
+      {
+        "seed": 3,
+        "best_epoch": 2,
+        "best_val_loss": 0.695465624332428
+      },
+      {
+        "seed": 4,
+        "best_epoch": 1,
+        "best_val_loss": 0.6935253143310547
+      }
+    ],
+    "lightgbm": [
+      {
+        "seed": 42,
+        "best_iteration": 21,
+        "best_val_logloss": 0.6961569228695264
+      },
+      {
+        "seed": 0,
+        "best_iteration": 24,
+        "best_val_logloss": 0.6963937163561389
+      },
+      {
+        "seed": 1,
+        "best_iteration": 8,
+        "best_val_logloss": 0.6964866740807847
+      },
+      {
+        "seed": 2,
+        "best_iteration": 31,
+        "best_val_logloss": 0.6964705846415096
+      },
+      {
+        "seed": 3,
+        "best_iteration": 12,
+        "best_val_logloss": 0.6963717749261124
+      },
+      {
+        "seed": 4,
+        "best_iteration": 20,
+        "best_val_logloss": 0.6963963447528154
+      }
+    ]
+  },
+  "stage5_seed_predictions_sha256": "103d89ca53224a260b5a3373e363cf4cceabf6d5f4b8c689db51ed01ba875282"
+}

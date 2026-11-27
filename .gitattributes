@@ -7,3 +7,4 @@ results/p1/stage4_walk_forward_predictions.csv -text
 results/p1/stage4_walk_forward_meta.json -text
 results/p1/models/* -text
 results/p1/*.csv -text
+results/p1/*_meta.json -text

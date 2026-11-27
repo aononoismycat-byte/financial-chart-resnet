@@ -82,6 +82,13 @@
       "change": "shap package replaced by LightGBM native TreeSHAP (booster.predict(..., pred_contrib=True)), mathematically identical; avoids numba/numpy-2.4 dependency.",
       "reason": "Keep CI and local environment free of numba/numpy-2.4 incompatibility while producing exact TreeSHAP attributions verified by row-sum additivity.",
       "recorded_before_running": true
+    },
+    {
+      "date": "2026-11-27",
+      "stage": "stage_5_robustness",
+      "change": "ResNet seeds are retrained on cached frozen-backbone embeddings (identical forward computation because the backbone and its BatchNorm are frozen and there is no augmentation; the RNG stream differs from the original, so seed 42 is rerun too). Full fine-tune seeds are not repeated (cost); this is listed as a limitation.",
+      "reason": "Eliminate redundant 20,120-image forward passes through frozen ImageNet weights across 6 seeds while preserving identical gradient/forward dynamics and testing logits equivalence beforehand.",
+      "recorded_before_running": true
     }
   ]
 }
