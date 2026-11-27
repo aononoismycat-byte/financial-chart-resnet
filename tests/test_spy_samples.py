@@ -1,8 +1,10 @@
 """Stage-C checks; real SPY is read-only and small synthetic data tests rules."""
+import json
 import tempfile
 import unittest
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import torch
 from PIL import ImageChops
@@ -21,15 +23,43 @@ METADATA = ROOT / "data" / "raw" / "SPY.metadata.json"
 class SpySamplesTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.frame = load_checked_spy(RAW, METADATA)
+        if RAW.is_file() and METADATA.is_file():
+            cls.raw_path = RAW
+            cls.metadata_path = METADATA
+        else:
+            temp_dir = tempfile.TemporaryDirectory()
+            cls.addClassCleanup(temp_dir.cleanup)
+            sessions = expected_sessions()
+            closes = 100.0 + np.linspace(0.0, 50.0, len(sessions)) + (np.arange(len(sessions)) % 5) * 0.25
+            cls.raw_path = Path(temp_dir.name) / "SPY.csv"
+            cls.metadata_path = Path(temp_dir.name) / "SPY.metadata.json"
+            pd.DataFrame({"Date": sessions.strftime("%Y-%m-%d"), "Close": closes}).to_csv(
+                cls.raw_path, index=False
+            )
+            cls.metadata_path.write_text(
+                json.dumps({
+                    "ticker": "SPY",
+                    "prediction_price_column": "Close",
+                    "parameters": {"auto_adjust": False},
+                    "validation": {
+                        "rows": len(sessions),
+                        "date_min": "2009-01-02",
+                        "date_max": "2025-12-31",
+                        "missing_values_by_column": {"Close": 0},
+                        "invalid_price_values_by_column": {"Close": 0},
+                    },
+                }),
+                encoding="utf-8",
+            )
+        cls.frame = load_checked_spy(cls.raw_path, cls.metadata_path)
 
     def test_sessions_and_missing_session_rejected(self):
         self.assertEqual(len(self.frame), len(expected_sessions()))
         with tempfile.TemporaryDirectory() as tmp:
             incomplete = Path(tmp) / "SPY.csv"
-            pd.read_csv(RAW).drop(index=100).to_csv(incomplete, index=False)
+            pd.read_csv(self.raw_path).drop(index=100).to_csv(incomplete, index=False)
             with self.assertRaisesRegex(ValueError, "session mismatch"):
-                load_checked_spy(incomplete, METADATA)
+                load_checked_spy(incomplete, self.metadata_path)
 
     def test_boundaries_labels_and_no_future_in_image(self):
         self.assertEqual(label_for(100.0, 100.0), 0)  # synthetic tie
