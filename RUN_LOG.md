@@ -105,6 +105,12 @@ Chronological record of protocol registration, training runs, frozen test evalua
   - Confirmatory family (Holm-Bonferroni corrected, `α=0.05`): all 4 null hypotheses failed to reject (`H1 LightGBM_wf2026` AUC `0.5055` [-0.0186, +0.0340] vs 0.5, Holm `p=1`; `H2 ResNet_pooled` AUC `0.4855`, Holm `p=1`; `H3 LR_closes_wf2026` AUC `0.4722`, Holm `p=0.9344`; `H4 ResNet - LR_closes_wf2026` `+0.0133`, Holm `p=1`).
   - Secondary 5 bp backtest (delay 0): Buy & hold Sharpe `0.108` (CAGR `0.48%`), LR (features, WF2026) `0.150` (CAGR `1.13%`), LightGBM (WF2026) `-0.048`, Pooled ResNet-18 `-0.054` (`83.5x/yr` turnover erasing `+3.48%` gross CAGR to `-0.75%` net).
 
+- **2026-11-27 — Stage 7: Integration, Documentation & Release (`v0.2.0`)**
+  - Command: `python scripts/p1_summary.py --overwrite`
+  - Generated unified cross-stage tables (`results/p1/summary_all.md`) and artifact index (`results/p1/README.md`), integrated Stage 8 confirmatory results into `docs/MODEL_CARD.md`, and rewrote `README.md` with P1 findings, four primary figures, reproduction commands, and governance links.
+  - Verified all unit tests pass (`python -m unittest discover -s tests`) and confirmed zero price columns in committed `results/p1/*.csv` artifacts prior to pushing and creating release `v0.2.0`.
+
+
 
 
 

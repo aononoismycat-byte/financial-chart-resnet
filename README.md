@@ -4,13 +4,18 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 ![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB.svg)
 
-An empirical, leakage-controlled evaluation of whether an ImageNet-pretrained ResNet-18 extracts next-session directional signal from 20-day closing-price line charts across five liquid ETFs (`SPY`, `QQQ`, `IWM`, `TLT`, `GLD`; 2010–2025, 20,120 samples). Designed around pre-registered model selection, chronological splits, cryptographic manifest verification, and explicit baseline benchmarking.
+An empirical, leakage-controlled evaluation of whether an ImageNet-pretrained ResNet-18 extracts next-session directional signal from 20-day closing-price line charts across five liquid ETFs (`SPY`, `QQQ`, `IWM`, `TLT`, `GLD`; 2010–2025, 20,120 samples). Designed around pre-registered model selection, chronological splits, cryptographic manifest verification, and explicit baseline benchmarking, and extended in **P1** with probabilistic calibration, cost-aware backtesting, engineered tabular & LightGBM baselines, 12-year walk-forward validation, multi-seed robustness, Grad-CAM/TreeSHAP explainability, SR 11-7 governance, and a **pre-registered 2026 confirmatory holdout** (`1,135` sessions).
 
 ### Key Findings
 
-- **Frozen-backbone transfer resists overfitting better than full fine-tuning**: On `SPY` validation data, freezing the ResNet-18 backbone (`0.6985` cross-entropy) outperformed full fine-tuning (`0.7340`), which rapidly overfit noisy chart images.
-- **Line-chart CNNs underperform simple baselines out of sample**: On `2,510` held-out 2024–2025 test windows, the pooled ResNet-18 achieved **48.17%** accuracy, trailing both a 20-day trend rule (**50.12%**) and a constant training-majority baseline (**55.26%**, driven by bull-market upward drift).
-- **Direct numeric inputs beat rendered 1-pixel line charts**: A post-hoc `StandardScaler` + logistic regression trained on the exact same 20 normalized closes reached **54.70%** overall test accuracy (`+6.53 pp` over ResNet-18), indicating no added predictive value from rendering univariate closes as 2D line images.
+1. **Calibration, not ranking, explains the ResNet accuracy gap**: On the 2024–2025 test split, Pooled ResNet-18 achieved `ROC-AUC = 0.516 [0.495, 0.537]`, virtually identical to logistic regression on the raw closes (`0.515 [0.487, 0.543]`; difference `+0.002`, CI `[−0.027, +0.029]`). Its `48.17%` accuracy vs. `55.26%` majority stems from probabilities shifted below `0.5` in an up-trending market, whereas majority has `50.00%` balanced accuracy and `0.500` AUC.
+2. **Transaction costs erode high-turnover chart signals**: At `5 bp` one-way cost (delay `0`), ResNet-18's `69.2x/yr` turnover yields a `0.607 [−0.438, 1.838]` Sharpe ratio (`3.99%` CAGR) vs. `1.493 [0.396, 2.878]` for Buy & Hold (`diff = −0.886 [−1.807, −0.087]`, `p = 0.03`).
+3. **Tabular baselines & LightGBM behaviour**: Under strict chronological validation (`2022–2023`), LightGBM early-stopped at `21` trees and effectively learned the training base rate (`100.00%` exposure, `50.00%` balanced accuracy, `AUC = 0.513 [0.493, 0.533]`). Logistic regression on 14 engineered features had the highest 2024–2025 AUC (`0.532`), but this did not persist out-of-sample (`2014–2023` walk-forward AUC `0.507`; `2026` holdout AUC `0.523 [0.485, 0.562]`).
+4. **Walk-forward stability (2014–2023 unseen OOS, 12,580 samples)**: Across 10 unseen annual folds, every model's pooled ROC-AUC sat between `0.500` and `0.509` (`LR closes 0.507`, `LR features 0.507`, `LightGBM 0.500`, `ResNet-18 emb + LR 0.509`), with every 95% confidence interval spanning `0.500`.
+5. **Seed sensitivity**: Across 6 random seeds (`42, 0..4`), ResNet-18 head accuracy ranged from `47.89%` to `55.78%` (`50.67% ± 2.84%`) while AUC moved only `0.5177 ± 0.0098`, illustrating why accuracy is an unstable thresholded metric under upward drift. All 10 Holm-corrected pairwise comparisons were non-significant (`p >= 0.14`).
+6. **Pre-registered 2026 confirmatory holdout** (`2026-01-02` to `2026-11-25`, `1,135` samples; frozen & pushed at commit [`5aa00e4`](https://github.com/aononoismycat-byte/financial-chart-resnet/commit/5aa00e4785af31c2f5acfd9c9b5685676bd10482) before data download): None of the four pre-registered confirmatory hypotheses (`H1–H4`) rejected the null after Holm correction (`Holm p >= 0.9344`; Buy & Hold 5 bp Sharpe `0.108`).
+
+**Overall conclusion**: No representation of 20 daily closes—visual or tabular—demonstrates exploitable next-day directional alpha net of transaction costs. The primary contribution of this repository is its leakage-controlled, pre-registered, and model-risk-governed empirical evaluation framework.
 
 ## Task and data
 
@@ -48,6 +53,32 @@ After the original ResNet test results were known, we trained one fixed logistic
 | 20-day trend | 52.79% | 52.59% | 48.01% | 46.61% | 50.60% | 50.12% |
 
 The numeric model exceeds the image model and trend baseline overall and on each asset, but falls below the majority baseline overall and on SPY, QQQ and TLT. This comparison does not demonstrate added value from the image representation; it also cannot establish that images never help, generalize beyond these assets or periods, or support a trading strategy. Complete validation and test metrics and matrices are in [numeric_baseline_posthoc.json](results/numeric_baseline_posthoc.json); the fixed protocol is in [numeric_baseline_protocol.json](results/numeric_baseline_protocol.json).
+
+## P1: Probabilistic, economic and robustness evaluation
+
+Following the frozen Phase 1/2 release, **P1** evaluates calibration, transaction-cost sensitivity (`0/2/5/10` bp one-way on dividend-adjusted `Adj Close` returns), 14 engineered close features + `LightGBM`, 12-year expanding walk-forward validation (`2014–2025`), 6-seed sensitivity, Grad-CAM / native TreeSHAP explainability, SR 11-7 governance ([docs/MODEL_CARD.md](docs/MODEL_CARD.md)), and a pre-registered 2026 confirmatory holdout ([results/p1/stage8_holdout.md](results/p1/stage8_holdout.md)). Note that all 2024–2025 P1 analyses are **post-hoc exploratory**, and any positive backtest figure is exploratory and conditional on execution/cost assumptions rather than evidence of live profitability. See [results/p1/summary_all.md](results/p1/summary_all.md) and [results/p1/README.md](results/p1/README.md) for the complete artifact index.
+
+### 2024–2025 Held-Out Test Summary (2,510 samples, 5 bp cost, delay 0)
+
+| Model | Accuracy | Balanced Acc | ROC-AUC [95% CI] | Brier Skill | 5 bp Sharpe [95% CI] | Max DD | Turnover/yr |
+|---|---:|---:|---|---:|---|---:|---:|
+| Majority / Buy & hold | 55.26% | 50.00% | 0.500 [0.500, 0.500] | 0.0000 | 1.493 [0.396, 2.878] | -12.84% | 0.5x |
+| 20-day trend | 50.12% | 48.25% | 0.482 [0.462, 0.503] | — | 0.833 [-0.293, 1.987] | -5.91% | 25.0x |
+| Pooled ResNet-18 | 48.17% | 50.30% | 0.516 [0.495, 0.537] | -0.0251 | 0.607 [-0.438, 1.838] | -7.68% | 69.2x |
+| Logistic regression (closes) | 54.70% | 50.26% | 0.515 [0.487, 0.543] | -0.0000 | 1.381 [0.310, 2.711] | -13.19% | 36.7x |
+| Logistic regression (features) | 55.26% | 50.84% | 0.532 [0.509, 0.555] | 0.0035 | 1.594 [0.574, 2.790] | -11.79% | 32.1x |
+| LightGBM (features) | 55.26% | 50.00% | 0.513 [0.493, 0.533] | 0.0002 | 1.493 [0.396, 2.878] | -12.84% | 0.5x |
+| LightGBM (extended, exploratory) | 55.22% | 49.97% | 0.511 [0.488, 0.536] | 0.0003 | 1.495 [0.405, 2.860] | -12.84% | 1.1x |
+
+> **2026 Confirmatory Holdout (`1,135` sessions, `2026-01-02`–`2026-11-25`)**: Pre-registered at commit `5aa00e4`; frozen `LightGBM_wf2026` (`AUC 0.5055`), `Pooled ResNet-18` (`0.4855`), `LR closes WF2026` (`0.4722`), and their paired difference (`+0.0133`) all yielded Holm-adjusted `p >= 0.9344` ([stage8_holdout.md](results/p1/stage8_holdout.md)).
+
+![Stage 1 calibration](results/p1/stage1_calibration_test.png)
+
+![Stage 2 equity at 5 bp](results/p1/stage2_equity_test.png)
+
+![Stage 4 walk-forward AUC](results/p1/stage4_auc_by_year.png)
+
+![Stage 6 Grad-CAM examples](results/p1/stage6_gradcam_examples.png)
 
 ## Prediction demo
 
@@ -90,11 +121,29 @@ To reproduce the post-hoc numeric experiment after building the five-asset datas
 
 This command requires the original source snapshot and exact manifest hashes recorded in `results/summary.json`; it fails instead of comparing different samples if a fresh download has changed. It does not need an image-model checkpoint or retraining, but it does require the original raw files and generated manifest. No full clean-environment replay has yet been performed.
 
+To reproduce the **P1 extension** (Stages 1–8) after building the five-asset dataset and training the pooled/SPY ResNet checkpoints:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/p1_export_predictions.py
+.\.venv\Scripts\python.exe scripts/p1_stage1_metrics.py --overwrite
+.\.venv\Scripts\python.exe scripts/p1_backtest.py --overwrite
+.\.venv\Scripts\python.exe scripts/p1_build_features.py --overwrite
+.\.venv\Scripts\python.exe scripts/p1_train_tabular.py --overwrite
+.\.venv\Scripts\python.exe scripts/p1_extract_embeddings.py --overwrite
+.\.venv\Scripts\python.exe scripts/p1_walk_forward.py --overwrite
+.\.venv\Scripts\python.exe scripts/p1_stage5_seeds.py --overwrite
+.\.venv\Scripts\python.exe scripts/p1_explain.py --overwrite
+.\.venv\Scripts\python.exe scripts/p1_freeze_holdout_models.py --overwrite
+.\.venv\Scripts\python.exe scripts/p1_download_holdout.py
+.\.venv\Scripts\python.exe scripts/p1_holdout_evaluate.py --pre-reg-commit 5aa00e4785af31c2f5acfd9c9b5685676bd10482 --overwrite
+.\.venv\Scripts\python.exe scripts/p1_summary.py --overwrite
+```
+
 ## Limitations and disclaimers
 
-- **Research-only scope**: This repository is an empirical machine-learning study, not financial advice, a trading system, or evidence of live profitability. Softmax outputs are uncalibrated classification scores, and raw accuracy omits transaction costs, slippage, turnover, and risk-adjusted return metrics.
-- **Statistical and regime constraints**: Overlapping 20-day windows and cross-asset correlations make observations non-i.i.d.; a single chronological split and single seed (`42`) do not establish statistical significance across market regimes. Test-set class proportions (`55.26%` Up) were recorded in the dataset audit prior to model selection, though test predictions were withheld until the frozen evaluation.
-- **Representation and price conventions**: A fixed `[0.8, 1.2]` chart range clips extreme volatility windows, and a 1-pixel close-only line omits OHLC range and volume information. Using `Close` with `auto_adjust=False` reflects ex-dividend drops rather than total return.
+- **Research-only scope**: This repository is an empirical machine-learning study, not financial advice, a trading system, or evidence of live profitability. Any positive exploratory backtest metric is conditional on frictionless or fixed-cost (`0–10` bp) market-on-close execution assumptions.
+- **Statistical and regime constraints**: Overlapping 20-day windows and correlated ETFs (`SPY`, `QQQ`, `IWM`, `TLT`, `GLD`) make observations dependent. Stage 5 varied seeds only on frozen-backbone heads and LightGBM (full end-to-end CNN fine-tuning was not repeated across seeds due to overfitting and compute constraints), and the confirmatory Stage 8 holdout covers a single ~11-month window (`2026`).
+- **Representation and price conventions**: A fixed `[0.8, 1.2]` chart range clips extreme volatility windows, and a 1-pixel close-only line omits OHLC range and volume information. Using `Close` with `auto_adjust=False` for model inputs reflects ex-dividend drops rather than total return (while backtest sleeves evaluate returns on `Adj Close`).
 - **Data terms and hardware determinism**: Market data are retrieved via [yfinance](https://github.com/ranaroussi/yfinance) (unaffiliated with Yahoo and intended for research/educational use; see [Yahoo Terms of Service](https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html) and [Yahoo Finance data providers](https://help.yahoo.com/kb/SLN2310.html)). Upstream history revisions or GPU/CUDA version differences can alter exact numerical replay.
 
-Planned extensions include transaction-cost-aware backtesting, threshold-independent and calibration metrics (ROC-AUC, balanced accuracy, Brier score), stronger tabular baselines, walk-forward validation, and feature attribution.
+For full model-risk documentation (intended use, conceptual soundness, lineage, explainability, and ongoing monitoring triggers), see [docs/MODEL_CARD.md](docs/MODEL_CARD.md).

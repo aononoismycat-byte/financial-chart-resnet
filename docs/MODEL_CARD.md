@@ -110,4 +110,16 @@ If any successor model in this family were deployed in a paper-trading or monito
 
 ## 10. Confirmatory 2026 Holdout (Stage 8)
 
-*Pending Stage 8 execution (`2026-01-02` to `2026-11-25` pre-registered holdout); to be populated in Stage 7.*
+- **Pre-registration Proof**: Four WF2026 models (`2010–2024` train, `2025` early stopping) and the confirmatory hypothesis family `H1–H4` were frozen, hashed, committed, and pushed at commit [`5aa00e4785af31c2f5acfd9c9b5685676bd10482`](https://github.com/aononoismycat-byte/financial-chart-resnet/commit/5aa00e4785af31c2f5acfd9c9b5685676bd10482) (GitHub Actions CI run `45969724476`, passed) **prior to** downloading any 2026 price history.
+- **Holdout Window & Audit**: `2026-01-02` through `2026-11-25` inclusive (`227` verified NYSE sessions per asset, `1,135` total samples, `51.01%` realized Up rate). Every asset matched its `2025-10-01..2025-12-31` `Close` overlap (`64` sessions) within `rtol = 1e-6`.
+- **Confirmatory Family (Holm-Bonferroni corrected, α = 0.05, block = 20, B = 5,000)**:
+
+| ID | Hypothesis | Estimate / Diff | 95% CI (diff vs null) | Raw p | Holm p | Significant? |
+|---|---|---:|---|---:|---:|---|
+| H1 | `AUC(lightgbm_wf2026) != 0.5` | 0.5055 | [-0.0186, +0.0340] | 0.6656 | 1.0000 | No |
+| H2 | `AUC(resnet_pooled) != 0.5` | 0.4855 | [-0.0505, +0.0218] | 0.4708 | 1.0000 | No |
+| H3 | `AUC(logreg_closes_wf2026) != 0.5` | 0.4722 | [-0.0745, +0.0178] | 0.2336 | 0.9344 | No |
+| H4 | `AUC(resnet_pooled) - AUC(logreg_closes_wf2026) != 0` | +0.0133 | [-0.0333, +0.0706] | 0.6376 | 1.0000 | No |
+
+- **Secondary 2026 Backtest (5 bp one-way, delay 0)**: Buy & Hold CAGR `0.48%`, Sharpe `0.108 [-1.500, 1.866]`; `LR (features, WF2026)` CAGR `1.13%`, Sharpe `0.150 [-1.441, 1.917]`; `LightGBM (WF2026)` CAGR `-1.79%`, Sharpe `-0.048 [-1.567, 1.586]`; `Pooled ResNet-18` CAGR `-0.75%`, Sharpe `-0.054 [-1.509, 1.695]` (`83.5x/yr` turnover wiping out `+3.48%` gross CAGR); `ResNet-18 emb + LR (WF2026)` CAGR `-4.95%`, Sharpe `-0.431`. Full tables in `results/p1/stage8_holdout.md` and `results/p1/stage8_backtest.md`.
+
