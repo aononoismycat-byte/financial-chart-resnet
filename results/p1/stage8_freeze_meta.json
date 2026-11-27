@@ -1,0 +1,16 @@
+{
+  "stage": "P1 Stage 8a pre-registration model freeze (2010-2024 train, 2025 early-stopping val)",
+  "n_train_2010_2024": 18870,
+  "n_val_2025": 1250,
+  "majority_class_2010_2024": 1,
+  "climatology_prob_2010_2024": 0.5356120826709062,
+  "lightgbm_wf2026_best_iteration": 34,
+  "lightgbm_wf2026_val_logloss": 0.6869671363141798,
+  "resnet_embedding_head_wf2026_converged": true,
+  "frozen_artifacts_sha256": {
+    "lightgbm_wf2026.txt": "e9690aaec403bc29c86f2168182ea78bc8ed6328b1792bf738ce1489018e5b0e",
+    "logreg_features_wf2026.json": "46d6090050c93cc8bb6e4ba11ef0aa055c91c4da1a7f884d7266915099b8a0f2",
+    "logreg_closes_wf2026.json": "9a325c1c84b6512da54dbf60b26b8ce806ef541caf8653ff526d66d29e975b77",
+    "resnet_embedding_head_wf2026.json": "97aefd5332da3da6b236bf3f1f2b84ec9c629fd9da52e296e0597764bd146d17"
+  }
+}

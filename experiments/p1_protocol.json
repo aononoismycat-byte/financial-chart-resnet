@@ -89,6 +89,50 @@
       "change": "ResNet seeds are retrained on cached frozen-backbone embeddings (identical forward computation because the backbone and its BatchNorm are frozen and there is no augmentation; the RNG stream differs from the original, so seed 42 is rerun too). Full fine-tune seeds are not repeated (cost); this is listed as a limitation.",
       "reason": "Eliminate redundant 20,120-image forward passes through frozen ImageNet weights across 6 seeds while preserving identical gradient/forward dynamics and testing logits equivalence beforehand.",
       "recorded_before_running": true
+    },
+    {
+      "date": "2026-11-27",
+      "stage": "stage_8_optional_fresh_holdout",
+      "change": "Pre-registered confirmatory 2026 holdout specification and frozen model hashes prior to downloading any 2026 price data.",
+      "reason": "Provide one truly untouched out-of-time confirmatory test after Phase 1/2 and P1 Stages 1-6.",
+      "recorded_before_running": true,
+      "holdout_window": {
+        "label_date_start": "2026-01-02",
+        "label_date_end": "2026-11-25",
+        "inclusive": true
+      },
+      "download_parameters": {
+        "source": "yfinance",
+        "start": "2025-10-01",
+        "end": "2026-11-26",
+        "interval": "1d",
+        "auto_adjust": false,
+        "actions": false,
+        "keepna": true,
+        "timeout": 20,
+        "raise_errors": true
+      },
+      "overlap_check": "2025-10-01..2025-12-31 Close must equal data/raw/{T}.csv within rtol=1e-6 on identical dates.",
+      "expected_2026_holidays": ["2026-01-19", "2026-02-16", "2026-04-03", "2026-05-25", "2026-06-19", "2026-07-03", "2026-09-07"],
+      "frozen_models_sha256": {
+        "resnet_pooled": "0e0fb7df7e351b388e64861400d99bd38163927996b784ce6d01000ff5dbab10",
+        "logreg_closes.json": "8e56423f3d9e71305689049bd64571724d0f8b42edce2fc2f870d3598fcb1c87",
+        "logreg_features.json": "ce9619b7e5d614e05528c1881013680a4a69596732ad28e2a21928d366e36588",
+        "lightgbm_seed42.txt": "e6c083176f850ef3cd59863479aaa61ed10a14a74bad4592bfae7127fa229181",
+        "lightgbm_wf2026.txt": "e9690aaec403bc29c86f2168182ea78bc8ed6328b1792bf738ce1489018e5b0e",
+        "logreg_features_wf2026.json": "46d6090050c93cc8bb6e4ba11ef0aa055c91c4da1a7f884d7266915099b8a0f2",
+        "logreg_closes_wf2026.json": "9a325c1c84b6512da54dbf60b26b8ce806ef541caf8653ff526d66d29e975b77",
+        "resnet_embedding_head_wf2026.json": "97aefd5332da3da6b236bf3f1f2b84ec9c629fd9da52e296e0597764bd146d17"
+      },
+      "confirmatory_family": {
+        "method": "Two-sided date-block bootstrap (block 20, B=5000, seed 20261127), Holm-Bonferroni correction at alpha=0.05",
+        "hypotheses": [
+          "H1: AUC(lightgbm_wf2026) != 0.5",
+          "H2: AUC(resnet_pooled) != 0.5",
+          "H3: AUC(logreg_closes_wf2026) != 0.5",
+          "H4: AUC(resnet_pooled) - AUC(logreg_closes_wf2026) != 0"
+        ]
+      }
     }
   ]
 }
