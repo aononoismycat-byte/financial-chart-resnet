@@ -1,0 +1,77 @@
+{
+  "stage": "P1 Stage 3 tabular baselines (post-hoc exploratory)",
+  "features_sha256": "765ecb8f04e9ea9e0244bd139f12e5efbba5e2fad7b1632a568907a38086a1d1",
+  "stage1_predictions_sha256": "c93e03915eab13e23fd3d6a584b5ed119f97a0ee6f9efac3505dc8baab46c771",
+  "versions": {
+    "lightgbm": "4.6.0",
+    "scikit_learn": "1.9.1"
+  },
+  "gates": {
+    "logreg_closes_exact_pred_match": true,
+    "logreg_closes_max_abs_prob_diff": 4.388489571738319e-11,
+    "serialized_models_verified": true
+  },
+  "lightgbm": {
+    "seed": 42,
+    "features": [
+      "ret_1",
+      "ret_5",
+      "ret_10",
+      "ret_19",
+      "vol_5",
+      "vol_19",
+      "rsi_14",
+      "ma_dev_5",
+      "ma_dev_10",
+      "ma_dev_20",
+      "max_dd_20",
+      "range_pos_20",
+      "skew_19",
+      "up_frac_19",
+      "asset_SPY",
+      "asset_QQQ",
+      "asset_IWM",
+      "asset_TLT",
+      "asset_GLD"
+    ],
+    "best_iteration": 21,
+    "best_val_logloss": 0.6961569228695264
+  },
+  "lightgbm_ext": {
+    "seed": 42,
+    "features": [
+      "ret_1",
+      "ret_5",
+      "ret_10",
+      "ret_19",
+      "vol_5",
+      "vol_19",
+      "rsi_14",
+      "ma_dev_5",
+      "ma_dev_10",
+      "ma_dev_20",
+      "max_dd_20",
+      "range_pos_20",
+      "skew_19",
+      "up_frac_19",
+      "hl_range_5",
+      "volume_z_20",
+      "mom_60",
+      "vol_60",
+      "asset_SPY",
+      "asset_QQQ",
+      "asset_IWM",
+      "asset_TLT",
+      "asset_GLD"
+    ],
+    "best_iteration": 28,
+    "best_val_logloss": 0.6954920161745769
+  },
+  "model_files_sha256": {
+    "lightgbm_seed42.txt": "e6c083176f850ef3cd59863479aaa61ed10a14a74bad4592bfae7127fa229181",
+    "lightgbm_ext_seed42.txt": "51693c3cd50f1b3da7f408a2c9eb13098d3066d20a9d133e16a1caa28ddaecac",
+    "logreg_features.json": "ce9619b7e5d614e05528c1881013680a4a69596732ad28e2a21928d366e36588",
+    "logreg_closes.json": "8e56423f3d9e71305689049bd64571724d0f8b42edce2fc2f870d3598fcb1c87"
+  },
+  "stage3_predictions_sha256": "83e81d2e08f0df0b11db9de329a036b959a8204d5e4f1ccc202c2c6dc9a46692"
+}

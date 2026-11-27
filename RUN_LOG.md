@@ -73,4 +73,10 @@ Chronological record of protocol registration, training runs, frozen test evalua
   - Evaluated equal-weight five-asset (`SPY`, `QQQ`, `IWM`, `TLT`, `GLD`) long/flat portfolios on dividend-adjusted `Adj Close` returns after verifying raw CSV hashes and session alignment against `multi_asset_samples.csv`.
   - Test (2024–2025, 5 bp one-way, delay 0): Buy & hold (= Majority) Sharpe `1.493` [0.396, 2.878] (CAGR `19.80%`, Max DD `-12.84%`); Logistic regression (closes) Sharpe `1.381` [0.310, 2.711] (`36.7x` turnover/yr); 20-day trend Sharpe `0.833` [-0.293, 1.987]; Pooled ResNet-18 Sharpe `0.607` [-0.438, 1.838] (`69.2x` turnover/yr, CAGR drops from `7.65%` at 0 bp to `3.99%` at 5 bp, Sharpe diff vs Buy & hold `-0.886` [-1.807, -0.087], `p=0.03`).
 
+- **2026-11-27 — Stage 3: Engineered Tabular Features & LightGBM Baselines (post-hoc exploratory)**
+  - Commands: `python scripts/p1_build_features.py --overwrite` and `python scripts/p1_train_tabular.py --overwrite`
+  - Gates passed: `20,120` feature rows matched `multi_asset_samples.csv` row-for-row; `(ret_19 > 0) == trend_pred` exact match on all `5,015` val/test rows; `logreg_closes` reproduced Stage 1 `logreg_pred` identically (`max |prob diff| = 4.39e-11`); serialized LightGBM/LogReg artifacts verified.
+  - Test (2024–2025): `LightGBM (features)` stopped at `best_iter=21`, ROC-AUC `0.513` [0.493, 0.533], Brier skill `+0.0002`, staying anchored near the training up-ratio (`100%` exposure, 5 bp Sharpe `1.493`). `LightGBM (extended, exploratory)` (`best_iter=28`) gave ROC-AUC `0.511` [0.488, 0.536] (diff vs primary `-0.0017`, `p=0.802`). `Logistic regression (features)` achieved the highest test ROC-AUC `0.532` [0.509, 0.555], Brier skill `+0.0035`, and 5 bp Sharpe `1.594` [0.574, 2.790] (vs Buy & hold `+0.101`, `p=0.593`), though its 2022–2023 validation Sharpe was `-0.425`.
+
+
 

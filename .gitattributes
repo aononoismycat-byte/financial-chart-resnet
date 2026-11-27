@@ -1,3 +1,5 @@
 # Hash-verified artifacts must keep exact bytes on every platform
 results/p1/predictions.csv -text
 results/p1/predictions_meta.json -text
+results/p1/stage3_predictions.csv -text
+results/p1/stage3_predictions_meta.json -text

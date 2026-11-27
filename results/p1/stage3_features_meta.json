@@ -1,0 +1,75 @@
+{
+  "stage": "P1 Stage 3 feature engineering",
+  "manifest_sha256": "e18bf1ed3225ccf88931f59472dabccd78b269a2f62229e1aebcb610d9fcf78b",
+  "raw_sha256": {
+    "SPY": "ebe6b7288ce52792fb34bddc40297556f64c4bb3c46fd4142eb5148271c2fa24",
+    "QQQ": "994be7cd42447d4aee66c2e4162fea539383d69b9593d0a63bc3f9663730c65f",
+    "IWM": "e7ca56ab34d6a42670438f26f0a3ba508b5ec757e1852fdd599b81c3a09744d5",
+    "TLT": "6ac874828d526f3ee05212200b884ef10db0309a1142ace7a83afaaa56772eda",
+    "GLD": "43fcce2adca2f343b51f2835d4df8abee7115fdfca18226911e18a4f9d587201"
+  },
+  "features_csv": "data/processed/p1_features.csv",
+  "features_sha256": "765ecb8f04e9ea9e0244bd139f12e5efbba5e2fad7b1632a568907a38086a1d1",
+  "rows_total": 20120,
+  "rows_by_split": {
+    "train": 15105,
+    "val": 2505,
+    "test": 2510
+  },
+  "norm_close_columns": [
+    "norm_close_00",
+    "norm_close_01",
+    "norm_close_02",
+    "norm_close_03",
+    "norm_close_04",
+    "norm_close_05",
+    "norm_close_06",
+    "norm_close_07",
+    "norm_close_08",
+    "norm_close_09",
+    "norm_close_10",
+    "norm_close_11",
+    "norm_close_12",
+    "norm_close_13",
+    "norm_close_14",
+    "norm_close_15",
+    "norm_close_16",
+    "norm_close_17",
+    "norm_close_18",
+    "norm_close_19"
+  ],
+  "primary_features": [
+    "ret_1",
+    "ret_5",
+    "ret_10",
+    "ret_19",
+    "vol_5",
+    "vol_19",
+    "rsi_14",
+    "ma_dev_5",
+    "ma_dev_10",
+    "ma_dev_20",
+    "max_dd_20",
+    "range_pos_20",
+    "skew_19",
+    "up_frac_19"
+  ],
+  "extended_features": [
+    "hl_range_5",
+    "volume_z_20",
+    "mom_60",
+    "vol_60"
+  ],
+  "asset_onehot": [
+    "asset_SPY",
+    "asset_QQQ",
+    "asset_IWM",
+    "asset_TLT",
+    "asset_GLD"
+  ],
+  "gates": {
+    "manifest_identity_passed": true,
+    "trend_pred_equality_passed": true,
+    "val_test_checked_rows": 5015
+  }
+}
