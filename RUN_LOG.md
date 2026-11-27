@@ -68,3 +68,9 @@ Chronological record of protocol registration, training runs, frozen test evalua
   - Command: `python scripts/p1_stage1_metrics.py` (CPU only, reads the committed predictions).
   - Pooled test: ResNet-18 accuracy `48.17%` but balanced accuracy `50.30%` [48.63, 52.01] and ROC-AUC `0.516` [0.495, 0.537], statistically indistinguishable from logistic regression (AUC difference `+0.002` [−0.027, +0.029]). Its accuracy deficit versus majority (`−7.09 pp` [−10.72, −3.35]) comes from probabilities shifted below 0.5 (miscalibrated intercept) in an up-trending test period, not from worse ranking. No model achieved positive Brier skill against climatology.
 
+- **2026-11-27 — Stage 2: Cost-Aware Long/Flat Backtest (post-hoc exploratory)**
+  - Command: `python scripts/p1_backtest.py --overwrite`
+  - Evaluated equal-weight five-asset (`SPY`, `QQQ`, `IWM`, `TLT`, `GLD`) long/flat portfolios on dividend-adjusted `Adj Close` returns after verifying raw CSV hashes and session alignment against `multi_asset_samples.csv`.
+  - Test (2024–2025, 5 bp one-way, delay 0): Buy & hold (= Majority) Sharpe `1.493` [0.396, 2.878] (CAGR `19.80%`, Max DD `-12.84%`); Logistic regression (closes) Sharpe `1.381` [0.310, 2.711] (`36.7x` turnover/yr); 20-day trend Sharpe `0.833` [-0.293, 1.987]; Pooled ResNet-18 Sharpe `0.607` [-0.438, 1.838] (`69.2x` turnover/yr, CAGR drops from `7.65%` at 0 bp to `3.99%` at 5 bp, Sharpe diff vs Buy & hold `-0.886` [-1.807, -0.087], `p=0.03`).
+
+

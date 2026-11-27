@@ -61,9 +61,12 @@ def log_loss(labels, probabilities):
 
 
 def brier_skill_score(labels, probabilities, reference_probability):
-    """1 - Brier(model) / Brier(constant reference probability)."""
+    """1 - Brier(model) / Brier(reference probability)."""
     y, _ = _labels_scores(labels, probabilities)
-    reference = brier(y, np.full(y.size, float(reference_probability)))
+    ref = np.asarray(reference_probability, dtype=float)
+    if ref.ndim == 0:
+        ref = np.full(y.size, float(ref))
+    reference = brier(y, ref)
     return math.nan if reference == 0 else 1.0 - brier(y, probabilities) / reference
 
 
