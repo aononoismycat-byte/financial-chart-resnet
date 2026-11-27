@@ -1,0 +1,42 @@
+{
+  "SPY": {
+    "rows_total": 291,
+    "overlap_rows": 64,
+    "sessions_2026": 227,
+    "first_2026_session": "2026-01-02",
+    "last_2026_session": "2026-11-25",
+    "csv_sha256": "e587daffc4295b41efa54f4a86ced17592ae95970d4a49f3bd9deffef3a97f4d"
+  },
+  "QQQ": {
+    "rows_total": 291,
+    "overlap_rows": 64,
+    "sessions_2026": 227,
+    "first_2026_session": "2026-01-02",
+    "last_2026_session": "2026-11-25",
+    "csv_sha256": "9a5b60884fdf955b3d55dae17fc67f710456a5364edc6cb9ed41862f4729e747"
+  },
+  "IWM": {
+    "rows_total": 291,
+    "overlap_rows": 64,
+    "sessions_2026": 227,
+    "first_2026_session": "2026-01-02",
+    "last_2026_session": "2026-11-25",
+    "csv_sha256": "297a3354c55860b9ec272adc2fbc5db5dbef7bd42d783c1529106cb97d9815cd"
+  },
+  "TLT": {
+    "rows_total": 291,
+    "overlap_rows": 64,
+    "sessions_2026": 227,
+    "first_2026_session": "2026-01-02",
+    "last_2026_session": "2026-11-25",
+    "csv_sha256": "964b9b8d22f1e457d825a5cd7231dd631546f6931c50128cb792e8384eb5d01c"
+  },
+  "GLD": {
+    "rows_total": 291,
+    "overlap_rows": 64,
+    "sessions_2026": 227,
+    "first_2026_session": "2026-01-02",
+    "last_2026_session": "2026-11-25",
+    "csv_sha256": "9c105af43e9449cd18ec4df1ff8365041b07250a6529f8cd9ca3a3e2ef5a154a"
+  }
+}

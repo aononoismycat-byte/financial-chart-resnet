@@ -1,4 +1,6 @@
 """Synthetic unit tests for Stage 8 holdout calendar and overlap verification."""
+import hashlib
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -57,6 +59,21 @@ class HoldoutVerificationTest(unittest.TestCase):
                 bad_cal = hold_df.iloc[:-1].copy()
                 with self.assertRaisesRegex(ValueError, "2026 session mismatch"):
                     hd.verify_holdout_file("SPY", bad_cal)
+
+
+S8_PREDS = Path(__file__).resolve().parent.parent / "results/p1/stage8_holdout_predictions.csv"
+
+
+@unittest.skipUnless(S8_PREDS.is_file(), "Stage 8 holdout predictions not generated yet")
+class CommittedStage8Test(unittest.TestCase):
+    def test_stage8_predictions_hash_and_no_prices(self):
+        meta = json.loads((S8_PREDS.parent / "stage8_holdout_meta.json").read_text(encoding="utf-8"))
+        self.assertEqual(hashlib.sha256(S8_PREDS.read_bytes()).hexdigest(), meta["predictions_sha256"])
+        df = pd.read_csv(S8_PREDS)
+        self.assertFalse({"close_t", "close_t1", "Close", "Adj Close"} & set(df.columns))
+        self.assertEqual(len(df), 1135)
+        self.assertTrue(df["label_date"].min() >= "2026-01-02")
+        self.assertTrue(df["label_date"].max() <= "2026-11-25")
 
 
 if __name__ == "__main__":

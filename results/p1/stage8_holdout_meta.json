@@ -1,0 +1,8 @@
+{
+  "stage": "P1 Stage 8 confirmatory 2026 holdout",
+  "pre_registration_commit": "5aa00e4785af31c2f5acfd9c9b5685676bd10482",
+  "window": "2026-01-02 to 2026-11-25",
+  "rows_total": 1135,
+  "sessions_per_asset": 227,
+  "predictions_sha256": "92be844086d521ea678d072c6e39acd3432d26a8b7b4240f3d53d4c9b750c668"
+}

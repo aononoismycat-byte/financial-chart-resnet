@@ -98,6 +98,14 @@ Chronological record of protocol registration, training runs, frozen test evalua
   - TreeSHAP (`lightgbm_seed42.txt`): base log-odds `+0.1613`, top drivers `ret_1` (`0.0222`), `ret_19` (`0.0058`), `max_dd_20` (`0.0057`), showing mild short-term mean reversion outweighed by the positive base-rate intercept (explaining `100%` test exposure / `50.00%` balanced accuracy).
   - Authored `docs/MODEL_CARD.md` under SR 11-7 governance headings.
 
+- **2026-11-27 — Stage 8: Confirmatory 2026 Holdout (`2026-01-02` to `2026-11-25`, confirmatory)**
+  - Pre-registration: frozen WF2026 models (`scripts/p1_freeze_holdout_models.py`) and protocol amendment (`H1–H4`, 2026 holiday list, SHA-256 hashes) committed and pushed at `5aa00e4785af31c2f5acfd9c9b5685676bd10482` (CI run `45969724476` green) **prior to** downloading any 2026 market data.
+  - Commands: `python scripts/p1_download_holdout.py` and `python scripts/p1_holdout_evaluate.py --pre-reg-commit 5aa00e4785af31c2f5acfd9c9b5685676bd10482 --overwrite`
+  - Verification: all 5 ETFs matched `2025-10-01..2025-12-31` overlap `Close` within `rtol=1e-6` (`64` rows) and matched all `227` expected 2026 NYSE sessions (`1,135` total test windows, `51.01%` Up rate).
+  - Confirmatory family (Holm-Bonferroni corrected, `α=0.05`): all 4 null hypotheses failed to reject (`H1 LightGBM_wf2026` AUC `0.5055` [-0.0186, +0.0340] vs 0.5, Holm `p=1`; `H2 ResNet_pooled` AUC `0.4855`, Holm `p=1`; `H3 LR_closes_wf2026` AUC `0.4722`, Holm `p=0.9344`; `H4 ResNet - LR_closes_wf2026` `+0.0133`, Holm `p=1`).
+  - Secondary 5 bp backtest (delay 0): Buy & hold Sharpe `0.108` (CAGR `0.48%`), LR (features, WF2026) `0.150` (CAGR `1.13%`), LightGBM (WF2026) `-0.048`, Pooled ResNet-18 `-0.054` (`83.5x/yr` turnover erasing `+3.48%` gross CAGR to `-0.75%` net).
+
+
 
 
 
