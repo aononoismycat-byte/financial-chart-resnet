@@ -78,5 +78,13 @@ Chronological record of protocol registration, training runs, frozen test evalua
   - Gates passed: `20,120` feature rows matched `multi_asset_samples.csv` row-for-row; `(ret_19 > 0) == trend_pred` exact match on all `5,015` val/test rows; `logreg_closes` reproduced Stage 1 `logreg_pred` identically (`max |prob diff| = 4.39e-11`); serialized LightGBM/LogReg artifacts verified.
   - Test (2024–2025): `LightGBM (features)` stopped at `best_iter=21`, ROC-AUC `0.513` [0.493, 0.533], Brier skill `+0.0002`, staying anchored near the training up-ratio (`100%` exposure, 5 bp Sharpe `1.493`). `LightGBM (extended, exploratory)` (`best_iter=28`) gave ROC-AUC `0.511` [0.488, 0.536] (diff vs primary `-0.0017`, `p=0.802`). `Logistic regression (features)` achieved the highest test ROC-AUC `0.532` [0.509, 0.555], Brier skill `+0.0035`, and 5 bp Sharpe `1.594` [0.574, 2.790] (vs Buy & hold `+0.101`, `p=0.593`), though its 2022–2023 validation Sharpe was `-0.425`.
 
+- **2026-11-27 — Stage 4: Frozen-Backbone Embeddings & Expanding Walk-Forward Validation (2014–2025)**
+  - Commands: `python scripts/p1_extract_embeddings.py --overwrite` and `python scripts/p1_walk_forward.py --overwrite`
+  - Embedding gates passed: all `100` non-fc ResNet-18 backbone tensors matched ImageNet weights exactly; `fc(embeddings)` reproduced Stage 1 `resnet_pooled_pred` identically on all `5,015` val/test samples with `max |prob diff| = 1.79e-7 < 1e-4` (using `batch_size=32` per split to match original cuDNN kernels).
+  - Fixed-split sanity check (`ResNet-18 embedding + LR`): test accuracy `52.59%`, ROC-AUC `0.510`, Pearson `r = 0.620` vs `resnet_pooled_prob`.
+  - Unseen 2014–2023 OOS (`12,580` samples): all models clustered tightly around chance (`ROC-AUC`: `LR closes` `0.507` [0.494, 0.520], `LR features` `0.507` [0.495, 0.519], `LightGBM` `0.500` [0.488, 0.511], `ResNet-18 emb + LR` `0.509` [0.498, 0.520]).
+  - Full 2014–2025 OOS backtest (5 bp, delay 0): Buy & hold Sharpe `0.950` [0.384, 1.534]; LightGBM `0.939` (`7.8x` turnover/yr); LR closes `0.792`; LR features `0.765` (diff vs Buy & hold `-0.185`, `p=0.0368`); ResNet-18 embedding + LR `0.336` [-0.168, 0.863] (`97.1x` turnover/yr, diff `-0.614`, `p=0.0002`).
+
+
 
 

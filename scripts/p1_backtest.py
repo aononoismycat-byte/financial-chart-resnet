@@ -32,7 +32,7 @@ DELAYS = (0, 1)
 MODEL_SPECS = {
     "buy_and_hold": {"col": None, "label": "Buy & hold (= Majority)", "portfolio": True},
     "trend_20d": {"col": "trend_pred", "label": "20-day trend", "portfolio": True},
-    "logreg_closes": {"col": "logreg_pred", "label": "Logistic regression (closes)", "portfolio": True},
+    "logreg_closes": {"col": "logreg_pred", "alt_col": "logreg_closes_pred", "label": "Logistic regression (closes)", "portfolio": True},
     "resnet_pooled": {"col": "resnet_pooled_pred", "label": "Pooled ResNet-18", "portfolio": True},
     "resnet_spy": {"col": "resnet_spy_pred", "label": "SPY ResNet-18", "portfolio": False},
     "logreg_features": {"col": "logreg_features_pred", "label": "Logistic regression (features)", "portfolio": True},
@@ -164,6 +164,8 @@ def run_backtest(
     for model in models:
         spec = MODEL_SPECS[model]
         col = spec["col"]
+        if col is not None and col not in aligned.columns and spec.get("alt_col") in aligned.columns:
+            col = spec["alt_col"]
         is_portfolio = spec["portfolio"]
         if is_portfolio:
             results["portfolio"][model] = {}

@@ -1,0 +1,146 @@
+{
+  "stage": "P1 Stage 4 expanding walk-forward validation (2014-2025)",
+  "features_sha256": "765ecb8f04e9ea9e0244bd139f12e5efbba5e2fad7b1632a568907a38086a1d1",
+  "embeddings_sha256": "18a9a7eb68119b46c37fa2a635bba074b51805903dafcbab7ddb581f404bbf4a",
+  "fixed_split_sanity_check": {
+    "converged": true,
+    "test_accuracy": 0.5258964143426295,
+    "test_roc_auc": 0.5104490816325875,
+    "pearson_r_vs_resnet_pooled_prob": 0.6198851455877966
+  },
+  "folds": [
+    {
+      "test_year": 2014,
+      "val_year": 2013,
+      "n_train": 3770,
+      "n_val": 1260,
+      "n_test": 1260,
+      "train_up_ratio": 0.5368700265251989,
+      "majority_class": 1,
+      "lightgbm_best_iteration": 2,
+      "resnet_embedding_head_converged": true
+    },
+    {
+      "test_year": 2015,
+      "val_year": 2014,
+      "n_train": 5030,
+      "n_val": 1260,
+      "n_test": 1260,
+      "train_up_ratio": 0.5397614314115308,
+      "majority_class": 1,
+      "lightgbm_best_iteration": 72,
+      "resnet_embedding_head_converged": true
+    },
+    {
+      "test_year": 2016,
+      "val_year": 2015,
+      "n_train": 6290,
+      "n_val": 1260,
+      "n_test": 1260,
+      "train_up_ratio": 0.5426073131955484,
+      "majority_class": 1,
+      "lightgbm_best_iteration": 3,
+      "resnet_embedding_head_converged": true
+    },
+    {
+      "test_year": 2017,
+      "val_year": 2016,
+      "n_train": 7550,
+      "n_val": 1260,
+      "n_test": 1255,
+      "train_up_ratio": 0.5341721854304636,
+      "majority_class": 1,
+      "lightgbm_best_iteration": 27,
+      "resnet_embedding_head_converged": true
+    },
+    {
+      "test_year": 2018,
+      "val_year": 2017,
+      "n_train": 8810,
+      "n_val": 1255,
+      "n_test": 1255,
+      "train_up_ratio": 0.5340522133938707,
+      "majority_class": 1,
+      "lightgbm_best_iteration": 37,
+      "resnet_embedding_head_converged": true
+    },
+    {
+      "test_year": 2019,
+      "val_year": 2018,
+      "n_train": 10065,
+      "n_val": 1255,
+      "n_test": 1260,
+      "train_up_ratio": 0.5377049180327869,
+      "majority_class": 1,
+      "lightgbm_best_iteration": 1,
+      "resnet_embedding_head_converged": true
+    },
+    {
+      "test_year": 2020,
+      "val_year": 2019,
+      "n_train": 11320,
+      "n_val": 1260,
+      "n_test": 1265,
+      "train_up_ratio": 0.5356007067137809,
+      "majority_class": 1,
+      "lightgbm_best_iteration": 6,
+      "resnet_embedding_head_converged": true
+    },
+    {
+      "test_year": 2021,
+      "val_year": 2020,
+      "n_train": 12580,
+      "n_val": 1265,
+      "n_test": 1260,
+      "train_up_ratio": 0.5391891891891892,
+      "majority_class": 1,
+      "lightgbm_best_iteration": 26,
+      "resnet_embedding_head_converged": true
+    },
+    {
+      "test_year": 2022,
+      "val_year": 2021,
+      "n_train": 13845,
+      "n_val": 1260,
+      "n_test": 1255,
+      "train_up_ratio": 0.5420729505236548,
+      "majority_class": 1,
+      "lightgbm_best_iteration": 18,
+      "resnet_embedding_head_converged": true
+    },
+    {
+      "test_year": 2023,
+      "val_year": 2022,
+      "n_train": 15105,
+      "n_val": 1255,
+      "n_test": 1250,
+      "train_up_ratio": 0.5404170804369414,
+      "majority_class": 1,
+      "lightgbm_best_iteration": 21,
+      "resnet_embedding_head_converged": true
+    },
+    {
+      "test_year": 2024,
+      "val_year": 2023,
+      "n_train": 16360,
+      "n_val": 1250,
+      "n_test": 1260,
+      "train_up_ratio": 0.5346577017114914,
+      "majority_class": 1,
+      "lightgbm_best_iteration": 122,
+      "resnet_embedding_head_converged": true
+    },
+    {
+      "test_year": 2025,
+      "val_year": 2024,
+      "n_train": 17610,
+      "n_val": 1260,
+      "n_test": 1250,
+      "train_up_ratio": 0.5345258375922771,
+      "majority_class": 1,
+      "lightgbm_best_iteration": 1,
+      "resnet_embedding_head_converged": true
+    }
+  ],
+  "walk_forward_predictions_sha256": "56c154a6465be72163be8e8060a33a372b6410660c178f6e0a000cedbb27e8c2"
+}

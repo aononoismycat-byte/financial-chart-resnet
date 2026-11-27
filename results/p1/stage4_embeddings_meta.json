@@ -1,0 +1,22 @@
+{
+  "stage": "P1 Stage 4 frozen-backbone embedding extraction",
+  "manifest_sha256": "e18bf1ed3225ccf88931f59472dabccd78b269a2f62229e1aebcb610d9fcf78b",
+  "pooled_checkpoint_sha256": "0e0fb7df7e351b388e64861400d99bd38163927996b784ce6d01000ff5dbab10",
+  "imagenet_weights_sha256": "f37072fd47e89c5e827621c5baffa7500819f7896bbacec160b1a16c560e07ec",
+  "shape": [
+    20120,
+    512
+  ],
+  "dtype": "float32",
+  "device": "cuda:0",
+  "embeddings_npy": "data/processed/p1_embeddings.npy",
+  "embeddings_sha256": "18a9a7eb68119b46c37fa2a635bba074b51805903dafcbab7ddb581f404bbf4a",
+  "keys_csv": "data/processed/p1_embeddings_keys.csv",
+  "keys_sha256": "6f8721538a346b3df7cc0141a907a17194687b23811ebd95cc69d85d0e9edc7e",
+  "gates": {
+    "imagenet_backbone_tensors_checked": 100,
+    "imagenet_backbone_exact_match": true,
+    "fc_reproduction_exact_pred_match": true,
+    "fc_reproduction_max_abs_prob_diff": 1.7881419944743016e-07
+  }
+}
