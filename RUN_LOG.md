@@ -82,7 +82,7 @@ Chronological record of protocol registration, training runs, frozen test evalua
   - Commands: `python scripts/p1_extract_embeddings.py --overwrite` and `python scripts/p1_walk_forward.py --overwrite`
   - Embedding gates passed: all `100` non-fc ResNet-18 backbone tensors matched ImageNet weights exactly; `fc(embeddings)` reproduced Stage 1 `resnet_pooled_pred` identically on all `5,015` val/test samples with `max |prob diff| = 1.79e-7 < 1e-4` (using `batch_size=32` per split to match original cuDNN kernels).
   - Fixed-split sanity check (`ResNet-18 embedding + LR`): test accuracy `52.59%`, ROC-AUC `0.510`, Pearson `r = 0.620` vs `resnet_pooled_prob`.
-  - Unseen 2014–2023 OOS (`12,580` samples): all models clustered tightly around chance (`ROC-AUC`: `LR closes` `0.507` [0.494, 0.520], `LR features` `0.507` [0.495, 0.519], `LightGBM` `0.500` [0.488, 0.511], `ResNet-18 emb + LR` `0.509` [0.498, 0.520]).
+  - Unseen 2014–2023 OOS (`12,580` samples): all models clustered tightly around chance (`ROC-AUC`: `LR closes` `0.507` [0.494, 0.520], `LR features` `0.507` [0.495, 0.519], `LightGBM` `0.500` [0.488, 0.511], `ResNet-18 emb + LR` `0.509` [0.498, 0.520]). Note: pooled fold-varying climatology yields a spurious `0.480` AUC artifact; walk-forward model AUCs must be evaluated against `0.500` rather than against the pooled `Majority` AUC row (caveat appended to `results/p1/stage4_walk_forward.md`).
   - Full 2014–2025 OOS backtest (5 bp, delay 0): Buy & hold Sharpe `0.950` [0.384, 1.534]; LightGBM `0.939` (`7.8x` turnover/yr); LR closes `0.792`; LR features `0.765` (diff vs Buy & hold `-0.185`, `p=0.0368`); ResNet-18 embedding + LR `0.336` [-0.168, 0.863] (`97.1x` turnover/yr, diff `-0.614`, `p=0.0002`).
 
 - **2026-11-27 — Stage 5: Multi-Seed Robustness & Holm-Corrected Family (post-hoc exploratory)**
@@ -90,6 +90,14 @@ Chronological record of protocol registration, training runs, frozen test evalua
   - Equivalence gate passed: full-model vs `fc(embedding)` `max |logit diff| = 2.38e-7 < 1e-4`.
   - Across 6 seeds (2024–2025 test): ResNet-18 head accuracy `50.67% ± 2.84%` (`47.89%`–`55.78%`), ROC-AUC `0.5177 ± 0.0098` (6-seed ensemble `0.5197 [0.5007, 0.5391]`); LightGBM accuracy `55.27% ± 0.02%` (balanced accuracy `50.01% ± 0.03%`), ROC-AUC `0.5118 ± 0.0066` (ensemble `0.5121 [0.4906, 0.5346]`).
   - Across the pre-specified 10-test comparison family (`roc_auc` and `log_loss`), all Holm-adjusted p-values were `>= 0.14` (no statistically significant pairwise separation).
+
+- **2026-11-27 — Stage 6: Grad-CAM, Native TreeSHAP & SR 11-7 Model Card (post-hoc exploratory)**
+  - Command: `python scripts/p1_explain.py --overwrite`
+  - Gates passed: Grad-CAM pass matched Stage 1 `resnet_pooled_pred` identically (`max |prob diff| = 5.00e-13`); native TreeSHAP additivity error `1.67e-16 < 1e-6`.
+  - Grad-CAM (`2,510` test charts): mean line lift `1.633x`, rightmost quarter share `0.2762` (vs `0.250` uniform), with background margin artifacts visible on low-volatility charts.
+  - TreeSHAP (`lightgbm_seed42.txt`): base log-odds `+0.1613`, top drivers `ret_1` (`0.0222`), `ret_19` (`0.0058`), `max_dd_20` (`0.0057`), showing mild short-term mean reversion outweighed by the positive base-rate intercept (explaining `100%` test exposure / `50.00%` balanced accuracy).
+  - Authored `docs/MODEL_CARD.md` under SR 11-7 governance headings.
+
 
 
 

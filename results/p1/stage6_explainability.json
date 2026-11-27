@@ -1,0 +1,129 @@
+{
+  "stage": "P1 Stage 6 explainability (post-hoc exploratory)",
+  "gradcam": {
+    "n_test": 2510,
+    "max_prob_diff_vs_stage1": 4.998779168374767e-13,
+    "uniform_right_quarter_baseline": 0.25,
+    "overall": {
+      "mean_right_quarter_share": 0.2762171028037345,
+      "sd_right_quarter_share": 0.1363837024443681,
+      "mean_line_lift": 1.6330121055842677,
+      "sd_line_lift": 0.617614541922634
+    },
+    "by_predicted_class": {
+      "predicted_non_up": {
+        "n": 1762,
+        "mean_right_quarter_share": 0.28197286950240974,
+        "mean_line_lift": 1.5866875299641716
+      },
+      "predicted_up": {
+        "n": 748,
+        "mean_right_quarter_share": 0.26265873258573214,
+        "mean_line_lift": 1.7421349695449757
+      }
+    }
+  },
+  "treeshap": {
+    "model": "results/p1/models/lightgbm_seed42.txt",
+    "n_test": 2510,
+    "expected_value_log_odds": 0.1613078276284288,
+    "additivity_max_abs_error": 1.6653345369377348e-16,
+    "ranking": [
+      {
+        "rank": 1,
+        "feature": "ret_1",
+        "mean_abs_shap": 0.022181852803176496
+      },
+      {
+        "rank": 2,
+        "feature": "ret_19",
+        "mean_abs_shap": 0.0058132177906647505
+      },
+      {
+        "rank": 3,
+        "feature": "max_dd_20",
+        "mean_abs_shap": 0.005673508728335982
+      },
+      {
+        "rank": 4,
+        "feature": "ret_10",
+        "mean_abs_shap": 0.005298833760638105
+      },
+      {
+        "rank": 5,
+        "feature": "asset_QQQ",
+        "mean_abs_shap": 0.005032448910444418
+      },
+      {
+        "rank": 6,
+        "feature": "ma_dev_5",
+        "mean_abs_shap": 0.004164422196560606
+      },
+      {
+        "rank": 7,
+        "feature": "rsi_14",
+        "mean_abs_shap": 0.0040250564418344795
+      },
+      {
+        "rank": 8,
+        "feature": "asset_TLT",
+        "mean_abs_shap": 0.0038960310783114345
+      },
+      {
+        "rank": 9,
+        "feature": "vol_5",
+        "mean_abs_shap": 0.003773326418719949
+      },
+      {
+        "rank": 10,
+        "feature": "up_frac_19",
+        "mean_abs_shap": 0.0037392877821322426
+      },
+      {
+        "rank": 11,
+        "feature": "range_pos_20",
+        "mean_abs_shap": 0.0032180831184351554
+      },
+      {
+        "rank": 12,
+        "feature": "ret_5",
+        "mean_abs_shap": 0.003092117128403253
+      },
+      {
+        "rank": 13,
+        "feature": "ma_dev_10",
+        "mean_abs_shap": 0.0025721291078539127
+      },
+      {
+        "rank": 14,
+        "feature": "ma_dev_20",
+        "mean_abs_shap": 0.0025003860981668755
+      },
+      {
+        "rank": 15,
+        "feature": "skew_19",
+        "mean_abs_shap": 0.0013121535549849815
+      },
+      {
+        "rank": 16,
+        "feature": "vol_19",
+        "mean_abs_shap": 0.0011765291738045245
+      },
+      {
+        "rank": 17,
+        "feature": "asset_GLD",
+        "mean_abs_shap": 0.0007792450310540642
+      },
+      {
+        "rank": 18,
+        "feature": "asset_SPY",
+        "mean_abs_shap": 0.0006123952252990384
+      },
+      {
+        "rank": 19,
+        "feature": "asset_IWM",
+        "mean_abs_shap": 0.0
+      }
+    ]
+  }
+}

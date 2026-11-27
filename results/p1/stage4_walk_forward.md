@@ -113,3 +113,6 @@ Positive differences favour A for accuracy, balanced accuracy and AUC; negative 
 | 2023 | 53.28% | 0.495 | 0.497 | 0.517 | 0.524 | 0.515 | unseen OOS |
 | 2024 | 55.08% | 0.477 | 0.486 | 0.534 | 0.497 | 0.501 | previously observed |
 | 2025 | 55.44% | 0.488 | 0.526 | 0.515 | 0.529 | 0.516 | previously observed |
+
+> **Note on walk-forward climatology AUC**: Across pooled walk-forward folds, the `Majority / climatology` column takes a different constant value per fold (`train_up_ratio` from `0.534` to `0.543`), which induces a spurious pooled ROC-AUC (`0.480` in 2014–2023 and `0.482` in 2014–2025) instead of `0.500`. Accordingly, walk-forward model AUCs should be evaluated against **0.500** rather than against the pooled `X − Majority` AUC difference (e.g., the `+0.0195` row for LightGBM reflects that spurious climatology ranking, not predictive skill).
+
